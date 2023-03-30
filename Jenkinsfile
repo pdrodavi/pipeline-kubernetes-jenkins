@@ -135,6 +135,16 @@ pipeline {
           }
       }
     }
+
+    stage('Deployment') {
+      steps {
+        container('docker') {
+          println("Executando Deploy")
+          sh 'cat deployment.yaml | sed "s/{{NAME_IMAGE}}/${readMavenPom().getArtifactId()}/g" | kubectl apply -f -'
+          //sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
+        }
+      }
+    }
     
   }
 }
