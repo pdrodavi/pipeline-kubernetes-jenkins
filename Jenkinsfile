@@ -152,7 +152,7 @@ pipeline {
       steps {
         container('docker') {
           println("Executando Deploy")
-          sh 'curl https://raw.githubusercontent.com/pdrodavi/pipeline-kubernetes-jenkins/main/deployment.yaml'
+          httpRequest consoleLogResponseBody: true, outputFile: 'deployment.yaml', url: "https://raw.githubusercontent.com/pdrodavi/pipeline-kubernetes-jenkins/main/deployment.yaml", wrapAsMultipart: false
           sh 'ls -a'
           sh 'pwd'
           sh 'cat deployment.yaml | sed "s/{{NAME_IMAGE}}/${readMavenPom().getArtifactId()}/g" | kubectl apply -f -'
