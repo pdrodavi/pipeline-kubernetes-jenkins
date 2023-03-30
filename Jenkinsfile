@@ -21,8 +21,6 @@ pipeline {
       steps {
         container('maven') {
           script {
-            sh 'ls -a'
-            sh 'pwd'
             def lst = [];
 
             withCredentials([string(name: 'CREDGH', credentialsId: 'github-rest-token', variable: 'GITHUBRESTJWT')]) {
@@ -52,8 +50,6 @@ pipeline {
                 println("Repositorio: https://github.com/pdrodavi/${inputName}.git")
                 println("Branch selecionada: ${inputBranch}")
                 git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/' + "${inputName}" + '.git'
-                sh 'ls -a'
-                sh 'pwd'
             }
           }
         }
@@ -63,8 +59,6 @@ pipeline {
     stage('Analysis') {
       steps {
           script {
-            sh 'ls -a'
-            sh 'pwd'
             inputAnalysis = input([
                     message: 'Analysis SonarQube?',
                     parameters: [
@@ -100,8 +94,6 @@ pipeline {
     stage('Package') {
       steps {
           script {
-            sh 'ls -a'
-            sh 'pwd'
             println("Realizando construção do artefato")
             println("Artifact: " + readMavenPom().getArtifactId())
             println("Version: " + readMavenPom().getVersion())
@@ -113,8 +105,6 @@ pipeline {
     stage('Build Image') {
       steps {
         container('docker') {
-          sh 'ls -a'
-          sh 'pwd'
           println("Criando a imagem Docker")
           sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
@@ -123,9 +113,9 @@ pipeline {
     
     stage('Publish Image') {
       steps {
+        container('docker') {
           script {
-            sh 'ls -a'
-            sh 'pwd'
+  
             inputPublish = input([
                     message: 'Publish to Registry?',
                     parameters: [
@@ -140,14 +130,19 @@ pipeline {
             }
 
             conditionalStage("Publish Image", executeStage) {
+                sh 'docker login -u pdrodavi -p Docker@2022'
+                sh "docker push pdrodavi/${readMavenPom().getArtifactId()}:latest"
+                /*
                 withDockerRegistry(credentialsId: Constants.JENKINS_JFROG_CREDENTIALS_ID, url: Constants.JENKINS_JFROG_URL_REGISTRY) {
                     sh "docker push pdrodavi/${readMavenPom().getArtifactId()}:latest"
-                }
+                }*/
             }
           }
+        }
       }
     }
 
+/*
     stage('Deployment') {
       steps {
         container('docker') {
@@ -205,7 +200,7 @@ pipeline {
           //sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
       }
-    }
+    }*/
     
   }
 }
