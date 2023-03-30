@@ -1,0 +1,29 @@
+---
+metadata:
+  name: {{NAME_IMAGE}}-deployment
+  namespace: bja-dev
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  template:
+    metadata:
+      namespace: bja-dev
+      labels:
+        app: {{NAME_IMAGE}}
+    spec:
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 0
+      containers:
+      - image: pdrodavi/{{NAME_IMAGE}}:latest
+        imagePullPolicy: IfNotPresent
+        name: {{NAME_IMAGE}}
+        ports:
+        - protocol: TCP
+          name: http
+          containerPort: 8080
+      restartPolicy: Always
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: {{NAME_IMAGE}}
