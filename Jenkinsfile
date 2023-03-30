@@ -46,7 +46,7 @@ pipeline {
                         ]
                 ])
 
-                deleteDir()
+                //deleteDir()
                 println("Repositorio: https://github.com/pdrodavi/${inputName}.git")
                 println("Branch selecionada: ${inputBranch}")
                 git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/' + "${inputName}" + '.git'
@@ -140,7 +140,7 @@ pipeline {
       steps {
         container('docker') {
           println("Executando Deploy")
-          sh 'cat deployment.yaml | sed "s/{{NAME_IMAGE}}/${readMavenPom().getArtifactId()}/g" | k3s kubectl apply -f -'
+          sh 'cat deployment.yaml | sed "s/{{NAME_IMAGE}}/${readMavenPom().getArtifactId()}/g" | kubectl apply -f -'
           //sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
       }
