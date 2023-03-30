@@ -22,6 +22,7 @@ pipeline {
         container('maven') {
           script {
             sh 'ls -a'
+            sh 'pwd'
             def lst = [];
 
             withCredentials([string(name: 'CREDGH', credentialsId: 'github-rest-token', variable: 'GITHUBRESTJWT')]) {
@@ -52,6 +53,7 @@ pipeline {
                 println("Branch selecionada: ${inputBranch}")
                 git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/' + "${inputName}" + '.git'
                 sh 'ls -a'
+                sh 'pwd'
             }
           }
         }
@@ -62,6 +64,7 @@ pipeline {
       steps {
           script {
             sh 'ls -a'
+            sh 'pwd'
             inputAnalysis = input([
                     message: 'Analysis SonarQube?',
                     parameters: [
@@ -98,6 +101,7 @@ pipeline {
       steps {
           script {
             sh 'ls -a'
+            sh 'pwd'
             println("Realizando construção do artefato")
             println("Artifact: " + readMavenPom().getArtifactId())
             println("Version: " + readMavenPom().getVersion())
@@ -110,6 +114,7 @@ pipeline {
       steps {
         container('docker') {
           sh 'ls -a'
+          sh 'pwd'
           println("Criando a imagem Docker")
           sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
@@ -120,6 +125,7 @@ pipeline {
       steps {
           script {
             sh 'ls -a'
+            sh 'pwd'
             inputPublish = input([
                     message: 'Publish to Registry?',
                     parameters: [
@@ -147,6 +153,7 @@ pipeline {
         container('docker') {
           println("Executando Deploy")
           sh 'ls -a'
+          sh 'pwd'
           sh 'cat deployment.yaml | sed "s/{{NAME_IMAGE}}/${readMavenPom().getArtifactId()}/g" | kubectl apply -f -'
           //sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
