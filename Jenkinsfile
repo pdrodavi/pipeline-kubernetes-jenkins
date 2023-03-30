@@ -24,8 +24,15 @@ pipeline {
             def lst = [];
 
             withCredentials([string(name: 'CREDGH', credentialsId: 'github-rest-token', variable: 'GITHUBRESTJWT')]) {
+              
+                inputName = input([
+                        message: 'Input Name Repository',
+                        parameters: [
+                                string(name: 'Only Name')
+                        ]
+                ])
 
-                httpRequest consoleLogResponseBody: true, customHeaders: [[maskValue: false, name: 'Accept', value: 'application/vnd.github+json'], [maskValue: false, name: 'Authorization', value: "Bearer ${GITHUBRESTJWT}"], [maskValue: false, name: 'X-GitHub-Api-Version', value: '2022-11-28']], outputFile: 'branches.json', url: "https://api.github.com/repos/pdrodavi/ivalid-api/branches", wrapAsMultipart: false
+                httpRequest consoleLogResponseBody: true, customHeaders: [[maskValue: false, name: 'Accept', value: 'application/vnd.github+json'], [maskValue: false, name: 'Authorization', value: "Bearer ${GITHUBRESTJWT}"], [maskValue: false, name: 'X-GitHub-Api-Version', value: '2022-11-28']], outputFile: 'branches.json', url: "https://api.github.com/repos/pdrodavi/${inputName}/branches", wrapAsMultipart: false
 
                 def props = readJSON file: "${env.WORKSPACE}/branches.json", returnPojo: true
                 props.each { key, value ->
@@ -40,8 +47,9 @@ pipeline {
                 ])
 
                 deleteDir()
+                println("Repositorio: https://github.com/pdrodavi/${inputName}.git")
                 println("Branch selecionada: ${inputBranch}")
-                git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/ivalid-api.git'
+                git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/' + "${inputName}" + '.git'
             }
           }
         }
