@@ -21,6 +21,7 @@ pipeline {
       steps {
         container('maven') {
           script {
+            sh 'ls -a'
             def lst = [];
 
             withCredentials([string(name: 'CREDGH', credentialsId: 'github-rest-token', variable: 'GITHUBRESTJWT')]) {
@@ -50,6 +51,7 @@ pipeline {
                 println("Repositorio: https://github.com/pdrodavi/${inputName}.git")
                 println("Branch selecionada: ${inputBranch}")
                 git branch: "${inputBranch}", changelog: false, poll: false, url: 'https://pdrodavi:' + "${GITHUBRESTJWT}" + '@github.com/pdrodavi/' + "${inputName}" + '.git'
+                sh 'ls -a'
             }
           }
         }
@@ -59,6 +61,7 @@ pipeline {
     stage('Analysis') {
       steps {
           script {
+            sh 'ls -a'
             inputAnalysis = input([
                     message: 'Analysis SonarQube?',
                     parameters: [
@@ -94,6 +97,7 @@ pipeline {
     stage('Package') {
       steps {
           script {
+            sh 'ls -a'
             println("Realizando construção do artefato")
             println("Artifact: " + readMavenPom().getArtifactId())
             println("Version: " + readMavenPom().getVersion())
@@ -105,6 +109,7 @@ pipeline {
     stage('Build Image') {
       steps {
         container('docker') {
+          sh 'ls -a'
           println("Criando a imagem Docker")
           sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
         }
@@ -114,6 +119,7 @@ pipeline {
     stage('Publish Image') {
       steps {
           script {
+            sh 'ls -a'
             inputPublish = input([
                     message: 'Publish to Registry?',
                     parameters: [
