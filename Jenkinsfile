@@ -59,9 +59,9 @@ pipeline {
     stage('Build Image') {
       steps {
         container('docker') {
-          println(readJSON(file: 'package.json').name)
+          //println(readJSON(file: 'package.json').name)
           println("Criando a imagem Docker")
-          //sh "docker build -t cwrdcorp.jfrog.io/docker/${env.Name}:latest ."
+          sh "docker build -t cwrdcorp.jfrog.io/docker/${readJSON(file: 'package.json').name}:latest ."
         }
       }
     }
