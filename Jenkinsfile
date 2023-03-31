@@ -59,7 +59,6 @@ pipeline {
     stage('Build Image') {
       steps {
         container('docker') {
-          //println(readJSON(file: 'package.json').name)
           println("Criando a imagem Docker")
           sh "docker build -t cwrdcorp.jfrog.io/docker/${readJSON(file: 'package.json').name}:latest ."
         }
@@ -88,7 +87,7 @@ pipeline {
 
               conditionalStage("Publish Image", executeStage) {
                   sh 'docker login -ucwrdcorp@gmail.com -p${REGISTRYJFROGPASS} cwrdcorp.jfrog.io'
-                  //sh "docker push cwrdcorp.jfrog.io/docker/${env.Name}:latest"
+                  sh "docker push cwrdcorp.jfrog.io/docker/${readJSON(file: 'package.json').name}:latest"
               }
 
 
