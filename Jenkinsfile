@@ -106,7 +106,7 @@ pipeline {
       steps {
         container('docker') {
           println("Criando a imagem Docker")
-          sh "docker build -t pdrodavi/${readMavenPom().getArtifactId()}:latest ."
+          sh "docker build -t cwrdcorp.jfrog.io/docker/${readMavenPom().getArtifactId()}:latest ."
         }
       }
     }
@@ -115,28 +115,33 @@ pipeline {
       steps {
         container('docker') {
           script {
+
+            withCredentials([string(name: 'CREDREG', credentialsId: 'registry-jfrog-pass', variable: 'REGISTRYJFROGPASS')]) {
   
-            inputPublish = input([
-                    message: 'Publish to Registry?',
-                    parameters: [
-                            choice(name: 'Publish', choices: ['Yes', 'No'], description: 'Publish image to artifactory')
-                    ]
-            ])
+                inputPublish = input([
+                        message: 'Publish to Registry?',
+                        parameters: [
+                                choice(name: 'Publish', choices: ['Yes', 'No'], description: 'Publish image to artifactory')
+                        ]
+                ])
 
-            Boolean executeStage = false
+                Boolean executeStage = false
 
-            if ("${inputPublish}" == 'Yes') {
-                executeStage = true
+                if ("${inputPublish}" == 'Yes') {
+                    executeStage = true
+                }
+
+                conditionalStage("Publish Image", executeStage) {
+                    sh 'docker login -ucwrdcorp@gmail.com -p${REGISTRYJFROGPASS} cwrdcorp.jfrog.io'
+                    sh "docker push cwrdcorp.jfrog.io/docker/${readMavenPom().getArtifactId()}:latest"
+                    /*
+                    withDockerRegistry(credentialsId: Constants.JENKINS_JFROG_CREDENTIALS_ID, url: Constants.JENKINS_JFROG_URL_REGISTRY) {
+                        sh "docker push pdrodavi/${readMavenPom().getArtifactId()}:latest"
+                    }*/
+                }
+
             }
 
-            conditionalStage("Publish Image", executeStage) {
-                sh 'docker login -u pdrodavi -p Docker@2022'
-                sh "docker push pdrodavi/${readMavenPom().getArtifactId()}:latest"
-                /*
-                withDockerRegistry(credentialsId: Constants.JENKINS_JFROG_CREDENTIALS_ID, url: Constants.JENKINS_JFROG_URL_REGISTRY) {
-                    sh "docker push pdrodavi/${readMavenPom().getArtifactId()}:latest"
-                }*/
-            }
           }
         }
       }
