@@ -69,29 +69,35 @@ pipeline {
       steps {
         container('docker') {
           script {
+
+            withCredentials([string(name: 'CREDREGDHPD', credentialsId: 'docker-hub-pdrodavi-pass', variable: 'DOCKERHUBPDRODAVI')]) {
   
-            inputPublish = input([
-                    message: 'Publish to Registry?',
-                    parameters: [
-                            choice(name: 'Publish', choices: ['Yes', 'No'], description: 'Publish image to artifactory')
-                    ]
-            ])
+              inputPublish = input([
+                      message: 'Publish to Registry?',
+                      parameters: [
+                              choice(name: 'Publish', choices: ['Yes', 'No'], description: 'Publish image to artifactory')
+                      ]
+              ])
 
-            Boolean executeStage = false
+              Boolean executeStage = false
 
-            if ("${inputPublish}" == 'Yes') {
-                executeStage = true
-            }
+              if ("${inputPublish}" == 'Yes') {
+                  executeStage = true
+              }
 
-            conditionalStage("Publish Image", executeStage) {
-                sh 'docker login -u pdrodavi -p Docker@2022'
-                sh "docker push pdrodavi/portal-developer-k8s:latest"
-            }
+              conditionalStage("Publish Image", executeStage) {
+                  sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI} docker.io'
+                  sh "docker push pdrodavi/portal-developer-k8s:latest"
+              }
+
+
           }
         }
       }
     }
     
+  }
+
   }
 
   post {
