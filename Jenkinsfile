@@ -86,7 +86,7 @@ pipeline {
               }
 
               conditionalStage("Publish Image", executeStage) {
-                  sh 'docker login -u pdrodavi -p ' + "${DOCKERHUBPDRODAVI}"
+                  sh "docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI}"
                   sh "docker push pdrodavi/portal-developer-k8s:latest"
               }
 
