@@ -98,6 +98,8 @@ pipeline {
     
   }
 
+  }
+
   post {
       always {
         container('docker') {
