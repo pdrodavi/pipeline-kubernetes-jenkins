@@ -70,7 +70,6 @@ pipeline {
         container('docker') {
           script {
 
-            withCredentials([string(name: 'CREDREG', credentialsId: 'registry-jfrog-pass', variable: 'REGISTRYJFROGPASS')]) {
   
               inputPublish = input([
                       message: 'Publish to Registry?',
@@ -86,12 +85,12 @@ pipeline {
               }
 
               conditionalStage("Publish Image", executeStage) {
-                  sh 'docker login -ucwrdcorp@gmail.com -p' + "${REGISTRYJFROGPASS}"
+                  sh 'docker login -ucwrdcorp@gmail.com -pFrog@2023'
                   sh "docker push cwrdcorp.jfrog.io/docker/portal-developer-k8s:latest"
               }
 
 
-          }
+
         }
       }
     }
