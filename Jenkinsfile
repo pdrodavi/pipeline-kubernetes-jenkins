@@ -86,7 +86,7 @@ pipeline {
               }
 
               conditionalStage("Publish Image", executeStage) {
-                  sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI} docker.io'
+                  sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI}'
                   sh "docker push pdrodavi/${readJSON(file: 'package.json').name}:latest ."
               }
 
