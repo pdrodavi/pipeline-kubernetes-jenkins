@@ -60,7 +60,7 @@ pipeline {
       steps {
         container('docker') {
           println("Criando a imagem Docker")
-          sh "docker build -t cwrdcorp.jfrog.io/docker/${readJSON(file: 'package.json').name}:latest ."
+          sh "docker build -t pdrodavi/${readJSON(file: 'package.json').name}:latest ."
         }
       }
     }
@@ -70,7 +70,7 @@ pipeline {
         container('docker') {
           script {
 
-            withCredentials([string(name: 'CREDREG', credentialsId: 'registry-jfrog-pass', variable: 'REGISTRYJFROGPASS')]) {
+            withCredentials([string(name: 'CREDREGDHPD', credentialsId: 'docker-hub-pdrodavi-pass', variable: 'DOCKERHUBPDRODAVI')]) {
   
               inputPublish = input([
                       message: 'Publish to Registry?',
@@ -86,8 +86,8 @@ pipeline {
               }
 
               conditionalStage("Publish Image", executeStage) {
-                  sh 'docker login -ucwrdcorp@gmail.com -p${REGISTRYJFROGPASS} cwrdcorp.jfrog.io'
-                  sh "docker push cwrdcorp.jfrog.io/docker/${readJSON(file: 'package.json').name}:latest"
+                  sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI} docker.io'
+                  sh "docker push pdrodavi/${readJSON(file: 'package.json').name}:latest ."
               }
 
 
