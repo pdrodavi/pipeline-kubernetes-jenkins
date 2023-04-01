@@ -70,7 +70,7 @@ pipeline {
         container('docker') {
           script {
 
-            withCredentials([string(name: 'CREDREGDHPD', credentialsId: 'docker-hub-pdrodavi-pass', variable: 'DOCKERHUBPDRODAVI')]) {
+            //withCredentials([string(name: 'CREDREGDHPD', credentialsId: 'docker-hub-pdrodavi-pass', variable: 'DOCKERHUBPDRODAVI')]) {
   
               inputPublish = input([
                       message: 'Publish to Registry?',
@@ -86,12 +86,13 @@ pipeline {
               }
 
               conditionalStage("Publish Image", executeStage) {
-                  sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI}'
+                  //sh 'docker login -u pdrodavi -p ${DOCKERHUBPDRODAVI}'
+                  sh 'docker login -u pdrodavi -p Docker@2022'
                   sh "docker push pdrodavi/${readJSON(file: 'package.json').name}:latest ."
               }
 
 
-          }
+          //}
           
         }
       }
